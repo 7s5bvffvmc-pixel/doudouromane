@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Le doudou idéal pour Romane</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gluten:wght@500;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Concept : un petit atelier de couture rose. Une question par page, cartes aux coutures pointillées, et à la fin une étiquette de doudou remplie par les réponses. */
+:root {
+  --bg: #FFE6EC;
+  --surface: #FFF8FA;
+  --ink: #4D1A31;
+  --ink-soft: #8A4B63;
+  --accent: #CC2F66;
+  --accent-ink: #FFFFFF;
+  --line: #EFA3BB;
+  --chip: #FFD6E2;
+  --focus: #4D1A31;
+  --tag: #FFF0C2;
+  --tag-ink: #5B3A12;
+  --tag-line: #D9B45A;
+  --bear: #F7B7C9;
+  --bear-in: #EE8FAE;
+  --muzzle: #FFE9D6;
+  --font-display: 'Gluten', 'Arial Rounded MT Bold', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #2B1120; --surface: #3A1A2C; --ink: #FFE4EC; --ink-soft: #E2A8BD;
+    --accent: #FF7FA8; --accent-ink: #3A0F22; --line: #8A4262; --chip: #4C2238;
+    --focus: #FFE4EC; --tag: #4B3A1F; --tag-ink: #FFE9B0; --tag-line: #9C7A32;
+    --bear: #F3A6BE; --bear-in: #D9789B; --muzzle: #FFD9C2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #2B1120; --surface: #3A1A2C; --ink: #FFE4EC; --ink-soft: #E2A8BD;
+  --accent: #FF7FA8; --accent-ink: #3A0F22; --line: #8A4262; --chip: #4C2238;
+  --focus: #FFE4EC; --tag: #4B3A1F; --tag-ink: #FFE9B0; --tag-line: #9C7A32;
+  --bear: #F3A6BE; --bear-in: #D9789B; --muzzle: #FFD9C2;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 var(--font-body);
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 18px; }
+
+.top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.bear { width: 96px; height: auto; display: block; }
+.b-head { fill: var(--bear); }
+.b-in { fill: var(--bear-in); }
+.b-muzzle { fill: var(--muzzle); }
+.b-ink { fill: var(--ink); }
+.b-cheek { fill: var(--accent); opacity: .35; }
+.b-stitch { stroke: var(--ink-soft); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+.b-mouth { stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+h1 {
+  margin: 0; font: 700 clamp(1.7rem, 7.5vw, 2.4rem)/1.1 var(--font-display);
+  color: var(--accent); text-wrap: balance;
+}
+.lead { margin: 6px 0 0; color: var(--ink-soft); }
+
+.prog { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: .9rem; color: var(--ink-soft); }
+.track { flex: 1; height: 12px; border-radius: 999px; background: var(--chip); overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--accent); border-radius: 999px; transition: width .3s ease; }
+
+.card {
+  background: var(--surface); border: 2.5px dashed var(--line); border-radius: 24px;
+  padding: 18px 16px; display: grid; gap: 12px; min-width: 0;
+}
+.enter { animation: slide-in .35s ease; }
+@keyframes slide-in { from { opacity: .2; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+.q { margin: 0; font: 700 1.2rem/1.25 var(--font-display); text-wrap: balance; }
+.q:focus { outline: none; }
+.hint { margin: -6px 0 0; color: var(--ink-soft); font-size: .92rem; }
+
+.love-card { padding-block: 26px; gap: 18px; text-align: center; }
+.love-card .q { font-size: clamp(1.7rem, 8vw, 2.2rem); line-height: 1.15; }
+.love { --n: 0; display: flex; gap: 12px; align-items: stretch; }
+.big {
+  min-width: 0; border: 0; border-radius: 20px; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700;
+}
+.big:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.yes {
+  flex: var(--yg, 1) 1 0; background: var(--accent); color: var(--accent-ink);
+  font-size: calc(1.5rem + var(--n) * .35rem); padding: calc(16px + var(--n) * 7px) 12px;
+  transition: flex-grow .35s ease, font-size .35s ease, padding .35s ease;
+}
+.no {
+  flex: 1 1 0; background: var(--chip); color: var(--ink); font-size: 1.5rem;
+  padding: 16px 0; overflow: hidden; white-space: nowrap;
+}
+.oops { margin: 0; min-height: 1.55em; font-weight: 800; color: var(--accent); text-wrap: balance; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: block; }
+.chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.chip span {
+  display: block; padding: 9px 14px; border-radius: 18px; background: var(--chip);
+  border: 2px solid transparent; font-weight: 600; line-height: 1.25;
+}
+.chip:hover span { border-color: var(--line); }
+.chip input:checked + span { background: var(--accent); color: var(--accent-ink); }
+.chip input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+.sw { position: relative; display: grid; justify-items: center; gap: 6px; text-align: center; font-size: .82rem; font-weight: 600; line-height: 1.2; }
+.sw input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.dot {
+  width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--line);
+  display: grid; place-items: center; transition: box-shadow .15s ease;
+}
+.sw input:checked ~ .dot { box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--accent); }
+.sw input:checked ~ .dot::after { content: "✓"; color: #4D1A31; font-weight: 800; font-size: 1.1rem; }
+.sw input:focus-visible ~ .dot { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+.range { width: 100%; accent-color: var(--accent); margin: 4px 0 0; }
+.ticks { display: flex; justify-content: space-between; font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
+.scale-val { margin: 0; font-weight: 800; color: var(--accent); min-height: 1.55em; }
+.scale-val.muted { color: var(--ink-soft); font-weight: 600; }
+
+.field {
+  width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+  border: 2px dashed var(--line); border-radius: 14px; padding: 11px 14px;
+}
+.field::placeholder { color: var(--ink-soft); opacity: .8; }
+.field:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+textarea.field { resize: vertical; min-height: 84px; }
+
+.nav { display: flex; gap: 10px; }
+.nav .next { flex: 1; }
+.btn {
+  background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px;
+  padding: 13px 24px; min-height: 48px; font: 800 1rem var(--font-body); cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.btn.ghost { background: transparent; color: var(--accent); border: 2px dashed var(--line); }
+
+.tag {
+  background: var(--tag); color: var(--tag-ink); border: 2.5px dashed var(--tag-line);
+  border-radius: 10px; padding: 18px 16px; display: grid; gap: 12px; min-width: 0;
+}
+.tag-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.tag h2 { margin: 0; font: 700 1.35rem/1.2 var(--font-display); }
+.tag h2:focus { outline: none; }
+.tag-small { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.tag-name { margin: 0; font: 700 1.7rem/1.1 var(--font-display); overflow-wrap: anywhere; }
+.tag dl { margin: 0; display: grid; grid-template-columns: minmax(84px, auto) minmax(0, 1fr); gap: 6px 14px; }
+.tag dt { font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding-top: .2em; }
+.tag dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.tag .empty { margin: 0; }
+
+.actions { display: grid; gap: 10px; justify-items: start; }
+.status { margin: 0; min-height: 1.55em; font-weight: 700; color: var(--ink-soft); }
+
+@media (max-width: 480px) {
+  .bear { width: 76px; }
+  .actions .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fill, .dot, .big { transition: none; }
+  .enter { animation: none; }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <svg class="bear" viewBox="0 0 120 110" role="img" aria-label="Petit ours en peluche">
+      <circle class="b-head" cx="30" cy="28" r="17"/><circle class="b-in" cx="30" cy="28" r="8.5"/>
+      <circle class="b-head" cx="90" cy="28" r="17"/><circle class="b-in" cx="90" cy="28" r="8.5"/>
+      <ellipse class="b-head" cx="60" cy="62" rx="45" ry="41"/>
+      <path class="b-stitch" d="M54 38l12 8M66 38l-12 8"/>
+      <ellipse class="b-muzzle" cx="60" cy="77" rx="17" ry="13"/>
+      <circle class="b-ink" cx="43" cy="60" r="4.2"/><circle class="b-ink" cx="77" cy="60" r="4.2"/>
+      <ellipse class="b-ink" cx="60" cy="71" rx="5.5" ry="3.8"/>
+      <path class="b-mouth" d="M60 74.5v4.5M53.5 81.5q6.5 5 13 0"/>
+      <circle class="b-cheek" cx="33" cy="74" r="6.5"/><circle class="b-cheek" cx="87" cy="74" r="6.5"/>
+    </svg>
+    <div>
+      <h1>Le doudou idéal pour Romane</h1>
+      <p class="lead" id="lead">Quelques questions pour trouver le doudou de tes rêves. Il n'y a pas de mauvaise réponse, sauf une.</p>
+    </div>
+  </header>
+
+  <div class="prog" aria-live="polite">
+    <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
+    <span id="count">Question 1 / 14</span>
+  </div>
+
+  <form id="form" class="wrap" autocomplete="off"></form>
+
+  <div id="final" class="wrap" hidden>
+    <section class="tag" aria-labelledby="tag-title">
+      <div class="tag-head">
+        <h2 id="tag-title" tabindex="-1">L'étiquette du doudou</h2>
+        <span class="tag-small">Fait pour toi</span>
+      </div>
+      <p class="tag-name" id="tag-name" hidden></p>
+      <p class="empty" id="tag-empty">Tu n'as pas répondu aux questions, reviens en arrière pour remplir l'étiquette.</p>
+      <dl id="tag-list" hidden></dl>
+    </section>
+    <div class="actions">
+      <button class="btn" type="button" id="send" hidden>Envoyer mes réponses</button>
+      <button class="btn" type="button" id="copy">Copier mes réponses</button>
+      <p class="status" id="status" role="status"></p>
+    </div>
+  </div>
+
+  <nav class="nav" id="nav" hidden>
+    <button class="btn ghost" type="button" id="back">Retour</button>
+    <button class="btn next" type="button" id="next">Passer</button>
+  </nav>
+</div>
+
+<script>
+(function () {
+  var Q = [
+    { id: 'type', short: 'Genre', kind: 'single', title: 'Quel genre de doudou tu veux ?', hint: 'Un seul choix.',
+      opts: ['Un animal', 'Un personnage déjà existant', 'Un personnage fictif'] },
+    { id: 'animal', short: 'Animal', kind: 'multi', title: 'Quel animal ?', hint: 'Autant que tu veux.', other: 'Un autre animal ?',
+      opts: ['Lapin', 'Ours', 'Chat', 'Chien', 'Éléphant', 'Renard', 'Mouton', 'Panda', 'Licorne', 'Hérisson', 'Canard'] },
+    { id: 'size', short: 'Taille', kind: 'scale', title: 'Quelle taille ?', hint: 'Fais glisser le curseur.',
+      labels: ['15 cm, il tient dans une poche', '25 cm, il tient dans les bras', '40 cm, parfait pour dormir', '60 cm, un vrai compagnon', '80 cm ou plus, il prend la moitié du lit'],
+      ticks: ['15', '25', '40', '60', '80+ cm'] },
+    { id: 'matter', short: 'Douceur', kind: 'single', title: 'Quelle douceur sous les doigts ?', hint: 'Un seul choix.',
+      opts: ['Lisse et doux', 'Bouclé', 'Poilu'] },
+    { id: 'colors', short: 'Couleurs', kind: 'swatch', title: 'Quelles couleurs ?', hint: 'Les roses sont à l\'honneur, mais tu fais ce que tu veux.',
+      opts: [
+        { n: 'Rose poudré', c: '#F4B6C6' }, { n: 'Rose bonbon', c: '#EE6FA0' }, { n: 'Blanc crème', c: '#FFF4E8' },
+        { n: 'Beige sable', c: '#E6CDAF' }, { n: 'Lilas', c: '#CDB8EE' }, { n: 'Bleu ciel', c: '#B7D8F2' },
+        { n: 'Menthe', c: '#BFE6D2' }, { n: 'Jaune beurre', c: '#FBE18B' }, { n: 'Gris perle', c: '#CFCBD2' }
+      ] },
+    { id: 'fill', short: 'Rembourrage', kind: 'multi', title: 'Comment doit-il être rempli ?', hint: 'Tu peux en cocher plusieurs.',
+      opts: ['Bien rebondi et moelleux', 'Mou, à écraser contre moi', 'Avec des graines, à chauffer', 'Avec une odeur de lavande'] },
+    { id: 'details', short: 'Détails', kind: 'area', title: 'Quels petits détails ?', hint: 'Ceux qui font la différence.', placeholder: 'Écris ce que tu veux' },
+    { id: 'usage', short: 'Usage', kind: 'multi', noOther: true, title: 'Il servira à quoi ?', hint: '',
+      opts: ['Penser à toi', 'Penser à toi', 'Penser à toi', 'Penser à toi'] },
+    { id: 'wash', short: 'Lavage', kind: 'single', title: 'Lavable en machine ?', hint: '',
+      opts: ['Indispensable', 'Ce serait bien', 'Pas grave'] },
+    { id: 'name', short: 'Prénom', kind: 'text', title: 'Il s\'appelle comment ?', hint: '', placeholder: 'Le prénom de ton doudou' },
+    { id: 'avoid', short: 'À éviter', kind: 'text', title: 'Ce qu\'il ne doit surtout pas avoir', hint: '', placeholder: 'Ex : des yeux en plastique, une couleur qui pique…' },
+    { id: 'note', short: 'Petit mot', kind: 'area', title: 'Un petit mot pour moi ?', hint: 'Tout ce que tu veux ajouter.', placeholder: 'Écris ici…' }
+  ];
+
+  var form = document.getElementById('form');
+  var finalEl = document.getElementById('final');
+  var touched = {};
+  var wrong = 0;
+  var cur = 0;
+  var LAST = Q.length + 1; /* index de l'étiquette finale */
+
+  var loveHTML =
+    '<section class="card love-card"><h2 class="q" id="h-love" tabindex="-1">Est-ce que tu m\'aimes ?</h2>' +
+    '<div class="love"><button type="button" class="big yes" id="yes">Oui</button>' +
+    '<button type="button" class="big no" id="no">Non</button></div>' +
+    '<p class="oops" id="oops" role="status"></p></section>';
+
+  function otherField(name, label) {
+    var l = label || 'Autre : écris ce que tu veux';
+    return '<input class="field" type="text" id="' + name + '-other" maxlength="60" placeholder="' + l + '" aria-label="' + l + '">';
+  }
+
+  function html(q) {
+    var body = '';
+    var name = 'q-' + q.id;
+    if (q.kind === 'single' || q.kind === 'multi') {
+      var t = q.kind === 'single' ? 'radio' : 'checkbox';
+      body = '<div class="chips" role="' + (q.kind === 'single' ? 'radiogroup' : 'group') + '" aria-labelledby="h-' + q.id + '">' +
+        q.opts.map(function (o) {
+          return '<label class="chip"><input type="' + t + '" name="' + name + '" value="' + o + '"><span>' + o + '</span></label>';
+        }).join('') + '</div>';
+      if (!q.noOther) body += otherField(name, q.other);
+    } else if (q.kind === 'swatch') {
+      body = '<div class="swatches" role="group" aria-labelledby="h-' + q.id + '">' +
+        q.opts.map(function (o) {
+          return '<label class="sw"><input type="checkbox" name="' + name + '" value="' + o.n + '"><span class="dot" style="background:' + o.c + '"></span><span>' + o.n + '</span></label>';
+        }).join('') + '</div>' + otherField(name);
+    } else if (q.kind === 'scale') {
+      body = '<input class="range" type="range" id="' + name + '" min="0" max="4" step="1" value="2" aria-labelledby="h-' + q.id + '">' +
+        '<div class="ticks" aria-hidden="true">' + q.ticks.map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</div>' +
+        '<p class="scale-val" id="' + name + '-val">' + q.labels[2] + '</p>';
+    } else if (q.kind === 'text') {
+      body = '<input class="field" type="text" id="' + name + '" maxlength="80" placeholder="' + q.placeholder + '" aria-labelledby="h-' + q.id + '">';
+    } else {
+      body = '<textarea class="field" id="' + name + '" rows="3" maxlength="400" placeholder="' + q.placeholder + '" aria-labelledby="h-' + q.id + '"></textarea>';
+    }
+    return '<section class="card"><h2 class="q" id="h-' + q.id + '" tabindex="-1">' + q.title + '</h2>' +
+      (q.hint ? '<p class="hint">' + q.hint + '</p>' : '') + body + '</section>';
+  }
+  form.innerHTML = loveHTML + Q.map(html).join('');
+  var cards = form.querySelectorAll('.card');
+  Q.forEach(function (q) { if (q.kind === 'scale') touched[q.id] = true; });
+
+  function read() {
+    var s = {};
+    Q.forEach(function (q) {
+      var name = 'q-' + q.id;
+      if (q.kind === 'single') {
+        var c = form.querySelector('input[name="' + name + '"]:checked');
+        var so = document.getElementById(name + '-other');
+        s[q.id] = (so && so.value.trim()) || (c ? c.value : '');
+      } else if (q.kind === 'multi' || q.kind === 'swatch') {
+        var v = Array.prototype.map.call(form.querySelectorAll('input[name="' + name + '"]:checked'), function (i) { return i.value; });
+        var mo = document.getElementById(name + '-other');
+        if (mo && mo.value.trim()) v.push(mo.value.trim());
+        s[q.id] = v;
+      } else if (q.kind === 'scale') {
+        s[q.id] = touched[q.id] ? q.labels[+document.getElementById(name).value] : '';
+      } else {
+        s[q.id] = document.getElementById(name).value.trim();
+      }
+    });
+    return s;
+  }
+
+  function has(v) { return Array.isArray(v) ? v.length > 0 : !!v; }
+  function show(v) {
+    return Array.isArray(v) ? v.filter(function (x, i) { return v.indexOf(x) === i; }).join(', ') : v;
+  }
+
+  function textOf(s) {
+    var lines = ['Le doudou idéal pour Romane', ''];
+    Q.forEach(function (q) {
+      if (has(s[q.id])) lines.push(q.short + ' : ' + show(s[q.id]));
+    });
+    return lines.length > 2 ? lines.join('\n') : '';
+  }
+
+  function renderTag() {
+    var s = read();
+    var nameEl = document.getElementById('tag-name');
+    nameEl.hidden = !s.name;
+    nameEl.textContent = s.name ? 'Il s\'appelle ' + s.name : '';
+    var dl = document.getElementById('tag-list');
+    dl.textContent = '';
+    var rows = Q.filter(function (q) { return q.id !== 'name' && has(s[q.id]); });
+    rows.forEach(function (q) {
+      var dt = document.createElement('dt'); dt.textContent = q.short;
+      var dd = document.createElement('dd'); dd.textContent = show(s[q.id]);
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    dl.hidden = rows.length === 0;
+    document.getElementById('tag-empty').hidden = rows.length > 0 || !!s.name;
+  }
+
+  var nav = document.getElementById('nav');
+  var back = document.getElementById('back');
+  var next = document.getElementById('next');
+
+  function updateNext() {
+    if (cur < 1 || cur > Q.length) return;
+    var answered = has(read()[Q[cur - 1].id]);
+    if (cur === Q.length) next.textContent = answered ? 'Voir mon étiquette' : 'Voir mon étiquette sans répondre';
+    else next.textContent = answered ? 'Suivant' : 'Passer';
+  }
+
+  function go(i, focus) {
+    cur = i;
+    Array.prototype.forEach.call(cards, function (c, k) { c.hidden = k !== i; });
+    finalEl.hidden = i !== LAST;
+    nav.hidden = i === 0 || i === LAST;
+    back.hidden = i < 2 && i !== LAST;
+    document.getElementById('lead').hidden = i > 0;
+    document.getElementById('count').textContent = i === LAST ? 'C\'est fini' : 'Question ' + (i + 1) + ' / ' + (Q.length + 1);
+    document.getElementById('fill').style.width = (i / LAST * 100) + '%';
+    if (i === LAST) renderTag();
+    updateNext();
+    var box = i === LAST ? finalEl : cards[i];
+    box.classList.remove('enter');
+    void box.offsetWidth;
+    box.classList.add('enter');
+    if (focus) {
+      window.scrollTo(0, 0);
+      var h = i === LAST ? document.getElementById('tag-title') : cards[i].querySelector('h2');
+      h.focus({ preventScroll: true });
+    }
+  }
+
+  /* première question : seul « Oui » fait avancer */
+  var yes = document.getElementById('yes');
+  var oops = document.getElementById('oops');
+  var noBtn = document.getElementById('no');
+  var love = document.querySelector('.love');
+  noBtn.addEventListener('click', function () {
+    wrong += 1;
+    oops.textContent = 'Tu t\'es trompée ' + wrong + ' fois, réessaie !';
+    love.style.setProperty('--n', String(Math.min(wrong, 4)));
+    yes.style.setProperty('--yg', String(Math.pow(2, Math.min(wrong, 4))));
+    if (wrong >= 4) {
+      noBtn.hidden = true;
+      yes.focus();
+    }
+  });
+  yes.addEventListener('click', function () { go(1, true); });
+
+  next.addEventListener('click', function () { go(cur + 1, true); });
+  back.addEventListener('click', function () { go(cur - 1, true); });
+
+  function onChange(e) {
+    var t = e.target;
+    if (t.type === 'radio') {
+      var oe = document.getElementById(t.name + '-other');
+      if (oe) oe.value = '';
+    }
+    if (t.type === 'text' && /-other$/.test(t.id) && t.value.trim()) {
+      var nm = t.id.replace(/-other$/, '');
+      Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"][name="' + nm + '"]'), function (r) { r.checked = false; });
+    }
+    if (t.type === 'range') {
+      var id = t.id.replace('q-', '');
+      touched[id] = true;
+      var q = Q.filter(function (x) { return x.id === id; })[0];
+      var out = document.getElementById(t.id + '-val');
+      out.textContent = q.labels[+t.value];
+      out.className = 'scale-val';
+    }
+    updateNext();
+  }
+  form.addEventListener('input', onChange);
+  form.addEventListener('change', onChange);
+  form.addEventListener('submit', function (e) { e.preventDefault(); });
+
+  var status = document.getElementById('status');
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = textOf(read());
+    if (!text) { status.textContent = 'Il n\'y a encore aucune réponse à copier.'; return; }
+    var p;
+    try { p = navigator.clipboard.writeText(text); } catch (err) { p = Promise.reject(err); }
+    p.then(function () {
+      status.textContent = 'Copié ! Colle-le dans un message pour moi.';
+    }, function () {
+      var sel = window.getSelection();
+      var r = document.createRange();
+      r.selectNodeContents(document.querySelector('.tag'));
+      sel.removeAllRanges(); sel.addRange(r);
+      status.textContent = 'Copie le texte sélectionné et envoie-le moi.';
+    });
+  });
+
+  /* Envoi automatique par email : colle ici ton lien Formspree (voir les étapes). */
+  var FORM_URL = '';
+
+  var sendBtn = document.getElementById('send');
+  if (FORM_URL) {
+    sendBtn.hidden = false;
+    document.getElementById('copy').classList.add('ghost');
+  }
+  sendBtn.addEventListener('click', function () {
+    var text = textOf(read());
+    if (!text) { status.textContent = 'Il n\'y a encore aucune réponse à envoyer.'; return; }
+    sendBtn.disabled = true;
+    status.textContent = 'Envoi en cours…';
+    fetch(FORM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ message: text, _subject: 'Le doudou idéal pour Romane' })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('http ' + r.status);
+      status.textContent = 'Envoyé ! Merci mon cœur.';
+    }).catch(function () {
+      status.textContent = 'Oups, ça n\'a pas marché. Utilise « Copier mes réponses » et envoie-les moi.';
+      sendBtn.disabled = false;
+    });
+  });
+
+  go(0, false);
+})();
+</script>
+</body>
+</html>
